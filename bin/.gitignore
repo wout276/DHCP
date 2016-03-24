@@ -1,2 +1,9 @@
-/UDPclient.class
+/DHCPclient.class
 /DHCPoptions.class
+/DHCPpacket.class
+/DHCPserver.class
+/DHCPsocket.class
+/UDPclient.class
+/UDPserver.class
+/copies/
+/guava-19.0.jar
