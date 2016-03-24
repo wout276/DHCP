@@ -100,7 +100,7 @@ public class DHCPclient {
 	                    }
 	                    System.out.println("Sleeping for renewal time: " + t1_long.toString());
 	                    //Thread.sleep(t1_long);
-	                    Thread.sleep(11000);
+	                    Thread.sleep((long) 11000);
 	                    System.out.println("Renewal time T1 is over.");
 	                    if (renewCount < 5){
 	                    	renewCount++;

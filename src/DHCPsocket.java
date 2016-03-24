@@ -50,7 +50,6 @@ public class DHCPsocket extends DatagramSocket  {
     public synchronized void send(DHCPpacket packet) throws java.io.IOException {
     	byte data[] = new byte[PACKET_SIZE];
     	data = packet.toByteArray();	
-    	System.out.println(Arrays.toString(data));
     	DatagramPacket result = new DatagramPacket(data, data.length, IPAddress, 1234);
     	this.send(result);
     }
