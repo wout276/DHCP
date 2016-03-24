@@ -4,6 +4,10 @@
 import java.io.IOException;
 import java.net.*;
 import java.util.Arrays;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import com.google.common.collect.*;
@@ -17,12 +21,38 @@ public class DHCPserver {
 	private static int ipOffset = 101;
 	private BiMap<Integer, String> connections = HashBiMap.create();
 	private static int MAX_CONNECTIONS = 20;
+	private ThreadPoolExecutor threadPool;
 	
 	public static void main(String[] args) throws Exception {
-		//Creating the socket
-		DHCPsocket serverSocket = new DHCPsocket();
-		serverSocket.bind(new InetSocketAddress("127.0.0.1",1234));
 		
+		
+		
+	}
+	
+	private void run(){
+		//Creating the socket
+		DHCPsocket serverSocket = null;
+		try {
+			serverSocket = new DHCPsocket();
+		} catch (IOException e) {}
+		try {
+			serverSocket.bind(new InetSocketAddress("127.0.0.1",1234));
+		} catch (SocketException e) {}
+				
+		//Starting a thread pool
+		this.threadPool = new ThreadPoolExecutor(3, 20, 3, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(5), new serverThread());
+	}
+	
+	private class serverThread implements ThreadFactory {
+
+		/* (non-Javadoc)
+		 * @see java.util.concurrent.ThreadFactory#newThread(java.lang.Runnable)
+		 */
+		@Override
+		public Thread newThread(Runnable r) {
+			return new Thread(r);
+		}
+
 	}
 	
 	private void setConnection(int nr, String mac){
