@@ -3,6 +3,8 @@ import java.net.*;
 import java.util.Random;
 import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.lang.NullPointerException;
 /**
  * @author Wouter
@@ -25,7 +27,7 @@ public class DHCPclient {
     static final int MESSAGE_TYPE = 53;
     static final int T1 = 58;
     static final int T2 = 59;
-	static String MACadr = new String("00:19:D2:66:52:47");
+	static String MACadr = new String("18:19:D2:66:52:47");
 	static byte [] MACadr_bytes = bytesFromMAC(MACadr);
 	
 	@SuppressWarnings("unused")
@@ -37,9 +39,10 @@ public class DHCPclient {
             //Initialize the DHCPpacket that will be used.
             DHCPpacket processingPacket = new DHCPpacket(IPAddress, serverPort);
             int renewCount = 1;
-            //Send discover packet.
+            //Start main loop
             mainloop:
             while (true) {
+            	Thread.sleep((long) 5000); 
             	//Preparing discover message.
             	processingPacket = prepareDiscover(processingPacket);
             	//Send message and store answer.
@@ -68,6 +71,7 @@ public class DHCPclient {
 	                System.out.println("Received a " + packetType);
 	                if (answerCode == (int) DHCPpacket.packetCode("NAK")){
 	                    System.out.println("Got 'NAK' answer, sending new 'DISCOVER' message.");
+	                    processingPacket = new DHCPpacket(IPAddress, serverPort);
 	                    continue mainloop;
 	                } else if (answerCode == (int) DHCPpacket.packetCode("ACK")){
 	                	//Start timing for leasetime.
@@ -97,24 +101,20 @@ public class DHCPclient {
 	                    	t1_long = leasetime_long/2;
 	                    }
 	                    System.out.println("Sleeping for renewal time: " + t1_long.toString());
-	                    //Thread.sleep(t1_long);
-	                    Thread.sleep((long) 11000);
+	                    Thread.sleep(t1_long*1000);
+	                    //Thread.sleep((long) 11000);
 	                    System.out.println("Renewal time T1 is over.");
-	                    if (renewCount < 5){
-	                    	renewCount++;
-	                    	System.out.println("Renew attempt " + Integer.toString(renewCount) + " out of 3");
-	                    	processingPacket = prepareRenew(processingPacket);
-	                    	try {
-	                    	processingPacket = sendReceive(processingPacket, clientSocket, leasetime_long-1000*t1_long);
-	                        } catch (TimeoutException ex) {
-	                        	// Leave group and close client
-	                    	    processingPacket = prepareRelease(processingPacket);
-	                    	    sendReceive(processingPacket, clientSocket, leasetime_long);
-	                    	    clientSocket.close();
-	                    	    System.out.println("Leasetime expired, connection not renewed.");
-	                    	    break mainloop;
-	                        }
-	                    }
+                    	processingPacket = prepareRenew(processingPacket);
+                    	try {
+                    	processingPacket = sendReceive(processingPacket, clientSocket, 1000*leasetime_long-1000*t1_long);
+                        } catch (TimeoutException ex) {
+                        	// Leave group and close client
+                    	    processingPacket = prepareRelease(processingPacket);
+                    	    processingPacket = sendReceive(processingPacket, clientSocket, leasetime_long);
+                    	    clientSocket.close();
+                    	    System.err.println("Leasetime expired, connection not renewed.");
+                    	    break mainloop;
+                        }
 	                }   
             	}         			
             }
@@ -154,7 +154,7 @@ public class DHCPclient {
 	    byte [] option = new byte[1];
 	    option[0] = (byte) DHCPpacket.packetCode("REQUEST");
 	    packet.getOptionsList().updateOption(MESSAGE_TYPE, option);
-        //get the ip-addres from the packet and request it
+        //get the ip-address from the packet and request it
 	    packet.getOptionsList().updateOption(REQUESTED_IP, packet.getYiaddr());
 	    return packet;
     }
@@ -190,13 +190,13 @@ public class DHCPclient {
         System.out.println("Sending a " + packetType + " packet and waiting for an answer.");
         //Listen for an answer.
         boolean answer = false;
-        // Instant previous, current;
-        // previous = Instant.now();
+        Instant previous, current;
+        previous = Instant.now();
         while (answer == false){
-            // current = Instant.now();
-            // if (previous != null || (ChronoUnit.MILLIS.between(previous,current)>time)) {
-            //    throw new TimeoutException();
-            //}
+            current = Instant.now();
+            if (previous == null || (ChronoUnit.MILLIS.between(previous,current)>time)) {
+               throw new TimeoutException();
+            }
             if (clientSocket.receive(resultPacket)){
                 System.out.println("Received packet");
 		answer = true;
@@ -212,6 +212,7 @@ public class DHCPclient {
 
     // Convert a byte[] to a string
     private static String stringFromByte(byte[] bytes){
+    	//System.out.println(Arrays.toString(bytes));
 	    String str = new String();
         for (int x = 0; x < bytes.length; x++) {
             if (x < 3) {
@@ -232,13 +233,13 @@ public class DHCPclient {
         return result;
     }
 
-    //Function for converting the MAC-addres to bytes
+    //Function for converting the MAC-address to bytes
     private static byte[] bytesFromMAC(String MACadr){
         String[] MACadr_split = MACadr.split(":");
         byte[] MACadr_bytes = new byte[16];
         for (int x=0; x<6; x++){
             MACadr_bytes[x] = (byte) (Integer.parseInt(MACadr_split[x], 16));
-        }   
-        return MACadr_bytes;     
+        }
+        return MACadr_bytes;
     }
 }
