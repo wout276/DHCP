@@ -1,6 +1,5 @@
 import java.io.IOException;
 import java.net.*;
-import java.util.Arrays;
 
 public class DHCPsocket extends DatagramSocket  {
 	private static int PACKET_SIZE = 1500; // default MTU for ethernet
