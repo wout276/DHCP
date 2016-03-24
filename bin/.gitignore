@@ -8,3 +8,5 @@
 /copies/
 /guava-19.0.jar
 /DHCPclienthandler.class
+/serverThread.class
+/DHCPserver$serverThread.class
