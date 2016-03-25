@@ -44,9 +44,10 @@ public class DHCPsocket extends DatagramSocket  {
     /**
      * Sends a DHCPMessage object to a predifined host.
      * @param inMessage well-formed DHCPMessage to be sent to a server
+     * @throws IOException 
      */
        
-    public synchronized void send(DHCPpacket packet) throws java.io.IOException {
+    public synchronized void send(DHCPpacket packet) throws IOException {
     	byte data[] = new byte[PACKET_SIZE];
     	data = packet.toByteArray();	
     	DatagramPacket result = new DatagramPacket(data, data.length, IPAddress, 1234);

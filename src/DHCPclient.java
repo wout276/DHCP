@@ -30,6 +30,7 @@ public class DHCPclient {
 	static String MACadr = new String("18:19:D2:66:52:47");
 	static byte [] MACadr_bytes = bytesFromMAC(MACadr);
 	
+	
 	@SuppressWarnings("unused")
 	public static void main(String[] args) throws Exception {
 		//Creating the socket
@@ -38,7 +39,6 @@ public class DHCPclient {
 		try {           
             //Initialize the DHCPpacket that will be used.
             DHCPpacket processingPacket = new DHCPpacket(IPAddress, serverPort);
-            int renewCount = 1;
             //Start main loop
             mainloop:
             while (true) {
