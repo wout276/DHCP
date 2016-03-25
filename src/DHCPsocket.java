@@ -49,7 +49,7 @@ public class DHCPsocket extends DatagramSocket  {
        
     public synchronized void send(DHCPpacket packet) throws IOException {
     	byte data[] = new byte[PACKET_SIZE];
-    	data = packet.toByteArray();	
+    	data = packet.toByteArray();
     	DatagramPacket result = new DatagramPacket(data, data.length, IPAddress, 1234);
     	this.send(result);
     }

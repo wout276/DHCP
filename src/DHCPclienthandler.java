@@ -1,9 +1,7 @@
 import java.io.IOException;
-<<<<<<< HEAD
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Random;
-=======
-import DHCPpacket;
->>>>>>> 022b92ddaf84e746d0f33a9fbf7dcd8eafe21844
 
 /**
  * @author r0449276
@@ -14,13 +12,10 @@ public class DHCPclienthandler implements Runnable {
 	static DHCPserver server = null;
 	static DHCPpacket packet = null;
 	static DHCPsocket socket = null;
-	static Integer serverPort = new Integer(1234);
-    static final long TIMEOUT = new Integer(10000);
     static final int REQUESTED_IP = 50;
     static final int LEASETIME = 51;
     static final int MESSAGE_TYPE = 53;
-    static final int T1 = 58;
-    static final int T2 = 59;
+    static Integer leasetime = 25;
 	//server.setConnection("ip", "MAC");
 	//server.getConnectionChaddr("ip");
 	//server.getConnectionIp("MAC");
@@ -54,8 +49,7 @@ public class DHCPclienthandler implements Runnable {
 	        	packet = chooseAckNak(packet);
 	        	send(packet);
 	        } else if (answerCode == (int) DHCPpacket.packetCode("RELEASE")){
-	        	packet = prepareRelease(packet);
-	        	send(packet);
+	        	handleRelease(packet);
 	        }
 		} catch(IOException ex) {
 			System.err.println(ex);
@@ -77,28 +71,53 @@ public class DHCPclienthandler implements Runnable {
 	
 	private static DHCPpacket prepareAck(DHCPpacket packet){
 		String MAC = MACFromBytes(packet.getChaddr());
-		String ip = server.setConnection(stringFromByte(packet.getYiaddr()),MAC);
+		server.setConnection(stringFromByte(packet.getYiaddr()),MAC);
 		//DHCPrequest opcode to bootReply
     	packet.setOp((byte) 2);
         //set messageType in options to 'offer'
     	byte[] option = new byte[1];
 	    option[0] = (byte) DHCPpacket.packetCode("ACK");
 	    packet.getOptionsList().updateOption(MESSAGE_TYPE, option);
+	    byte[] lt = ByteBuffer.allocate(4).putInt(leasetime).array();
+	    packet.getOptionsList().updateOption(LEASETIME, lt);
     	return packet;
 	}
 	
 	private static DHCPpacket prepareNak(DHCPpacket packet){
+		//DHCPrequest opcode to bootReply
+    	packet.setOp((byte) 2);
+    	byte[] empty = new byte[4];
+    	packet.setYiaddr(empty);
+    	packet.setCiaddr(empty);
+    	packet.setSiaddr(empty);
+        //set messageType in options to 'offer'
+    	byte[] option = new byte[1];
+	    option[0] = (byte) DHCPpacket.packetCode("NAK");
+	    packet.getOptionsList().updateOption(MESSAGE_TYPE, option);
 		return packet;
 	}
 	
 	private static void handleRelease(DHCPpacket packet){
-		String MAC_bytes = MACFromBytes(packet.getChaddr());
-		server.removeConnection(MAC_bytes);
+		String MAC = MACFromBytes(packet.getChaddr());
+		server.removeConnection(MAC);
 	}
 	
 	private static DHCPpacket chooseAckNak(DHCPpacket packet){
-		packet = prepareAck(packet);
-		packet = prepareNak(packet);
+		//Check renewal
+		byte[] yiaddr = packet.getYiaddr();
+		byte[] reqIp = packet.getOptionsList().getOption(REQUESTED_IP);
+		String MAC = MACFromBytes(packet.getChaddr());
+		if (Arrays.equals(packet.getCiaddr(), yiaddr) && server.getConnectionChaddr(MAC) == stringFromByte(yiaddr)){
+			packet = prepareAck(packet); 
+		} else if (Arrays.equals(yiaddr,reqIp) || (!Arrays.equals(yiaddr, new byte[4]) && Arrays.equals(reqIp, new byte[4]))){
+			if (server.isIpAvailable(stringFromByte(yiaddr))){
+				packet = prepareAck(packet);
+			} else {
+				packet = prepareNak(packet);
+			}			
+		} else {
+			packet = prepareNak(packet);
+		}		
 		return packet;
 	}
 	
