@@ -1,4 +1,5 @@
 import java.io.IOException;
+import DHCPpacket;
 
 /**
  * @author r0449276

@@ -3,12 +3,10 @@
  */
 import java.io.IOException;
 import java.net.*;
-import java.util.Arrays;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import com.google.common.collect.*;
 
@@ -28,7 +26,7 @@ public class DHCPserver {
 		server.run();
 	}
 	
-	private void run(){
+	private void run() throws Exception{
 		//Creating the socket
 		DHCPsocket serverSocket = null;
 		try {
@@ -61,11 +59,17 @@ public class DHCPserver {
 		}
 	}
 	
-	public synchronized void setConnection(int nr, String mac){
+	public synchronized void setConnection(String ip, String mac){
+		int nr = parseIp(ip);
 		connections.put(nr, mac);
 	}
 
-	public String getConnectionChaddr(int nr){
+	public synchronized void removeConnection(String mac){
+		connections.inverse().remove(mac);
+	}
+	
+	public String getConnectionChaddr(String ip){
+		int nr = parseIp(ip);
 		return connections.get(nr);
 	}
 	
@@ -73,25 +77,35 @@ public class DHCPserver {
 		return connections.inverse().get(mac);
 	}
 
-	public int assignIpNumber(String mac){
+	public String assignIpNumber(String mac){
 		int ip = ipOffset;
 		boolean available = false;
 		while (available == false){
 			if (connections.containsKey(ip)){
 				ip++;
 				if (ip > ipOffset + MAX_CONNECTIONS - 1){
-					return -1;
+					return "No ip available";
 				}
 			} else {
 				available = true;
 			}
 		}
-		return ip;
+		return parseIp(ip);
 	}
 	
 	private String parseIp(int ipNumber){
 		String ip = ipBase + Integer.toString(ipNumber);
 		return ip;
+	}
+	
+	private int parseIp(String ip){
+		int ipNumber = Integer.parseInt(ip.substring(8));
+		return ipNumber;
+	}
+
+	public boolean isIpAvailable(String ip) {
+		int nr = parseIp(ip);
+		return !connections.containsKey(nr);
 	}
 
 
