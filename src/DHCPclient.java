@@ -13,15 +13,16 @@ import java.lang.NullPointerException;
 public class DHCPclient {
 	
 	//Servername or IP-adress with formatting: "127.0.0.1"
-	//static String serverHostname = new String("10.33.14.246");
-	static String serverHostname = new String("localhost");
+	static String serverHostname = new String("10.33.14.246");
+	//static String serverHostname = new String("localhost");
 	static InetAddress IPAddress = null;
 	static {
 			try {
 				IPAddress = InetAddress.getByName(serverHostname);
 			} catch (UnknownHostException e) {}
 	}
-	static Integer serverPort = new Integer(5555);
+	static Integer serverPort = new Integer(1234);
+	static Integer clientPort = new Integer(1234);
     static final long TIMEOUT = new Integer(10000);
     static final int REQUESTED_IP = 50;
     static final int LEASETIME = 51;
@@ -179,11 +180,11 @@ public class DHCPclient {
         return packet;
     }
 
-    private static DHCPpacket sendReceive(DHCPpacket packet, DHCPsocket clientSocket, long time) throws TimeoutException, IOException {
+    private static DHCPpacket sendReceive(DHCPpacket packet, DHCPsocket clientSocket, long time) throws TimeoutException, IOException, InterruptedException {
         //Send the DHCPpacket and print the messagetype you're sending.
         clientSocket.send(packet);
         //create a DHCPpacket container for the answer
-        DHCPpacket resultPacket = new DHCPpacket(IPAddress, serverPort);
+        DHCPpacket resultPacket = new DHCPpacket(IPAddress, clientPort);
         //get and print the messagetype
         int code = (int) (packet.getOptionsList().getOption(MESSAGE_TYPE))[0];
         String packetType = DHCPpacket.packetCode(code);
@@ -199,7 +200,7 @@ public class DHCPclient {
             }
             if (clientSocket.receive(resultPacket)){
                 System.out.println("Received packet");
-		answer = true;
+                answer = true;
                 if  (Arrays.equals(MACadr_bytes,resultPacket.getChaddr())){
                 	answer = true;
                 }

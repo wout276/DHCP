@@ -42,7 +42,9 @@ public class DHCPclienthandler implements Runnable {
 	        System.out.println("Received a " + packetType);
 	        //Determining to messageType and making an answer.
 	        if (answerCode == (int) DHCPpacket.packetCode("DISCOVER")){
+	        	System.out.println("Ik ben niet achterlijk");
 	        	packet = prepareOffer(packet);
+	        	System.out.println("Tis geprepareerd");
 	        	send(packet);
 	        } else if (answerCode == (int) DHCPpacket.packetCode("REQUEST")){
 	        	packet = chooseAckNak(packet);
@@ -121,7 +123,12 @@ public class DHCPclienthandler implements Runnable {
 	}
 	
 	private static void send(DHCPpacket packet) throws IOException{
-		socket.send(packet);
+		System.out.println("We zitten in send");
+		socket.serverSend(packet);
+		int answerCode = (int)(packet.getOptionsList().getOption(MESSAGE_TYPE))[0];
+        String packetType = DHCPpacket.packetCode(answerCode);
+        System.out.println("Sent a " + packetType);
+		Thread.currentThread().interrupt();
 	}
 	
 	//TODO
@@ -169,7 +176,7 @@ public class DHCPclienthandler implements Runnable {
         	MACadr[k] = part;
         	ip = ip.substring(pos + 1);
         }
-        MACadr[4] = Byte.parseByte(ip);
+        MACadr[3] = Byte.parseByte(ip);
         return MACadr;
     }
 }

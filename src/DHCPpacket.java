@@ -32,12 +32,12 @@ public class DHCPpacket {
     /**
      * Default DHCP client port
      */
-    public static final int CLIENT_PORT = 68; // client port (by default)
+    public static final int CLIENT_PORT = 5554; // client port (by default)
 
     /**
      * Default DHCP server port
      */
-    public static final int SERVER_PORT = 5555; // server port (by default)
+    public static final int SERVER_PORT = 1234; // server port (by default)
     
     /**
      * Broadcast address declaration
@@ -50,8 +50,8 @@ public class DHCPpacket {
     static {
     	if (BROADCAST_ADDRESS == null) {
     	    try {
-    		//BROADCAST_ADDRESS = InetAddress.getByName("10.33.14.246");
-    	    BROADCAST_ADDRESS = InetAddress.getByName("localhost");
+    		BROADCAST_ADDRESS = InetAddress.getByName("10.33.14.246");
+    	    //BROADCAST_ADDRESS = InetAddress.getByName("localhost");
     	    } catch (UnknownHostException e) {} 
     	}
         }
@@ -156,7 +156,7 @@ public class DHCPpacket {
     		this.setHlen(hlena[0]);
     		data.read(hopsa);
     		this.setHops(hopsa[0]);
-                //System.out.println("bytes ok");
+            System.out.println("bytes ok");
     		data.read(xid);
     		data.read(secs);
     		data.read(flags);
@@ -168,9 +168,9 @@ public class DHCPpacket {
     		data.read(sname);
     		data.read(file);
     		data.read(options);
-                //System.out.println("bytearray ok");
+            System.out.println("bytearray ok");
     		optionsList.fromByteArray(options);
-                //System.out.println("options ok");
+            System.out.println("options ok");
     	} catch (IOException ex) {
 		System.err.println(ex);
 	}

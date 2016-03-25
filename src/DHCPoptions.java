@@ -44,14 +44,16 @@ public class DHCPoptions {
 	
 	public void fromByteArray(byte[] dataArray){
 		this.getOptions().clear();
+		System.out.println(Arrays.toString(dataArray));
 		byte[] dataclip = Arrays.copyOfRange(dataArray, 4, dataArray.length);
 		ByteArrayInputStream data = new ByteArrayInputStream(dataclip);
 		byte[] code = new byte[1], length = new byte[1];
 		whileloop:
 		while(true){
 			try {
-				data.read(code);
-				if ((int) code[0] == 255 || (int) code[0] == -1){
+				int read = data.read(code);
+				// System.out.println(Arrays.toString(code));
+				if ((int) code[0] == 255 || (int) code[0] == -1 || read == -1){
 					break whileloop;
 				}
 				data.read(length);

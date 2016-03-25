@@ -3,8 +3,8 @@ import java.net.*;
 
 public class DHCPsocket extends DatagramSocket  {
 	private static int PACKET_SIZE = 1500; // default MTU for ethernet
-	//private static String serverHostname = new String("10.33.14.246");
-	private static String serverHostname = new String("localhost");
+	private static String serverHostname = new String("10.33.14.246");
+	//private static String serverHostname = new String("localhost");
 	private static InetAddress IPAddress = null;
 	static {
 			try {
@@ -14,20 +14,20 @@ public class DHCPsocket extends DatagramSocket  {
 				System.err.println(ex);
 			}
 	}
-    private int defaultSOTIME_OUT = 10000; // 10 second socket timeout
+    //private int defaultSOTIME_OUT = 10000; // 10 second socket timeout
     
     
     //constructor
     public DHCPsocket (int port) throws SocketException, IOException {
     	super(port);
     	//containers for data to transmit   
-    	this.setSoTimeout(defaultSOTIME_OUT); // set default time out
+    	//this.setSoTimeout(defaultSOTIME_OUT); // set default time out
     }
     
   //constructor
     public DHCPsocket () throws SocketException, IOException {
     	//containers for data to transmit   
-    	this.setSoTimeout(defaultSOTIME_OUT); // set default time out
+    	//this.setSoTimeout(defaultSOTIME_OUT); // set default time out
     }
     
     /**
@@ -58,7 +58,14 @@ public class DHCPsocket extends DatagramSocket  {
     public synchronized void send(DHCPpacket packet) throws IOException {
     	byte data[] = new byte[PACKET_SIZE];
     	data = packet.toByteArray();
-    	DatagramPacket result = new DatagramPacket(data, data.length, IPAddress, 5555);
+    	DatagramPacket result = new DatagramPacket(data, data.length, IPAddress,1234);
+    	this.send(result);
+    }
+    
+    public synchronized void serverSend(DHCPpacket packet) throws IOException {
+    	byte data[] = new byte[PACKET_SIZE];
+    	data = packet.toByteArray();
+    	DatagramPacket result = new DatagramPacket(data, data.length, IPAddress, 5554);
     	this.send(result);
     }
     
@@ -70,8 +77,10 @@ public class DHCPsocket extends DatagramSocket  {
 	    this.receive(receivePacket);
 	    System.out.println("Ontvangen in socket");
 	    byte[] data = receivePacket.getData();
+	    System.out.println("Getdata kleir");
 	    //System.out.println("getdata");
 	    packet.readByteArray(data);
+	    System.out.println("read byte array kleir");
 	    //System.out.println("kleir");
 	} catch (java.io.IOException ex) {
 		// System.err.println(ex);
