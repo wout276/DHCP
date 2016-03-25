@@ -61,7 +61,7 @@ public class DHCPserver {
 		}
 	}
 	
-	public void setConnection(int nr, String mac){
+	public synchronized void setConnection(int nr, String mac){
 		connections.put(nr, mac);
 	}
 
