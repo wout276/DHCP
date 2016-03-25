@@ -50,7 +50,8 @@ public class DHCPpacket {
     static {
     	if (BROADCAST_ADDRESS == null) {
     	    try {
-    		BROADCAST_ADDRESS = InetAddress.getByName("10.33.14.246");
+    		//BROADCAST_ADDRESS = InetAddress.getByName("10.33.14.246");
+    	    BROADCAST_ADDRESS = InetAddress.getByName("localhost");
     	    } catch (UnknownHostException e) {} 
     	}
         }

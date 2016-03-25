@@ -31,10 +31,15 @@ public class DHCPserver {
 		DHCPsocket serverSocket = null;
 		try {
 			serverSocket = new DHCPsocket();
-		} catch (IOException e) {}
+		} catch (IOException ex) {
+			System.err.println(ex);
+		}
 		try {
-			serverSocket.bind(new InetSocketAddress("127.0.0.1",1234));
-		} catch (SocketException e) {}
+			//serverSocket.bind(new InetSocketAddress("127.0.0.1",1234));
+			serverSocket.bind(new InetSocketAddress(1234));
+		} catch (SocketException ex) {
+			System.err.println(ex);
+		}
 				
 		//Starting a thread pool
 		this.threadPool = new ThreadPoolExecutor(2, 5, 10000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(5), new serverThread());
@@ -42,7 +47,12 @@ public class DHCPserver {
 		
 		while(true){
 			DHCPpacket receiver = new DHCPpacket();
-			serverSocket.receive(receiver);
+			boolean received = false;
+			while (!received){
+				System.out.println("Aan het ontvangen.");
+				received = serverSocket.receive(receiver);
+			}
+			System.out.println("ONTVANGEN");
 			DHCPclienthandler handler = new DHCPclienthandler(this, receiver, serverSocket);
 			this.threadPool.execute(handler);
 		}

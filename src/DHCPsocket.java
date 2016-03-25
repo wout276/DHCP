@@ -3,7 +3,8 @@ import java.net.*;
 
 public class DHCPsocket extends DatagramSocket  {
 	private static int PACKET_SIZE = 1500; // default MTU for ethernet
-	private static String serverHostname = new String("10.33.14.246");
+	//private static String serverHostname = new String("10.33.14.246");
+	private static String serverHostname = new String("localhost");
 	private static InetAddress IPAddress = null;
 	static {
 			try {
@@ -13,7 +14,7 @@ public class DHCPsocket extends DatagramSocket  {
 				System.err.println(ex);
 			}
 	}
-    private int defaultSOTIME_OUT = 10000; // 3 second socket timeout
+    private int defaultSOTIME_OUT = 10000; // 10 second socket timeout
     
     
     //constructor
@@ -58,14 +59,15 @@ public class DHCPsocket extends DatagramSocket  {
 	try {
 	    DatagramPacket receivePacket = new DatagramPacket(new byte[PACKET_SIZE],PACKET_SIZE);
 	    //System.out.println("Beginnen ontvangen");
+	    System.out.println("Start ontvangen in socket.");
 	    this.receive(receivePacket);
-	    //System.out.println("Ontvangen");
+	    System.out.println("Ontvangen in socket");
 	    byte[] data = receivePacket.getData();
 	    //System.out.println("getdata");
 	    packet.readByteArray(data);
 	    //System.out.println("kleir");
 	} catch (java.io.IOException ex) {
-		System.err.println(ex);
+		// System.err.println(ex);
 	    return false;
         }  // end catch    
 	return true;

@@ -13,7 +13,8 @@ import java.lang.NullPointerException;
 public class DHCPclient {
 	
 	//Servername or IP-adress with formatting: "127.0.0.1"
-	static String serverHostname = new String("10.33.14.246");
+	//static String serverHostname = new String("10.33.14.246");
+	static String serverHostname = new String("localhost");
 	static InetAddress IPAddress = null;
 	static {
 			try {
@@ -32,7 +33,6 @@ public class DHCPclient {
 	
 	@SuppressWarnings("unused")
 	public static void main(String[] args) throws Exception {
-		System.out.println("Ulle moe is ulle va");
 		//Creating the socket
 		DHCPsocket clientSocket = new DHCPsocket();
 		System.out.println("Connecting to " + IPAddress);
