@@ -2,7 +2,7 @@
  * 
  */
 import java.io.IOException;
-import java.net.*;
+//import java.net.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -30,16 +30,17 @@ public class DHCPserver {
 		//Creating the socket
 		DHCPsocket serverSocket = null;
 		try {
-			serverSocket = new DHCPsocket();
+			serverSocket = new DHCPsocket(5555);
 		} catch (IOException ex) {
 			System.err.println(ex);
 		}
+		/**
 		try {
-			//serverSocket.bind(new InetSocketAddress("127.0.0.1",1234));
-			serverSocket.bind(new InetSocketAddress(1234));
+			//serverSocket.bind(new InetSocketAddress("127.0.0.1",5555));
+			serverSocket.bind(new InetSocketAddress(5555));
 		} catch (SocketException ex) {
 			System.err.println(ex);
-		}
+		}*/
 				
 		//Starting a thread pool
 		this.threadPool = new ThreadPoolExecutor(2, 5, 10000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(5), new serverThread());

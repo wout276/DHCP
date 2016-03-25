@@ -37,7 +37,7 @@ public class DHCPpacket {
     /**
      * Default DHCP server port
      */
-    public static final int SERVER_PORT = 1234; // server port (by default)
+    public static final int SERVER_PORT = 5555; // server port (by default)
     
     /**
      * Broadcast address declaration

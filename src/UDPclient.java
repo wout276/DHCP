@@ -39,7 +39,7 @@ public class UDPclient {
 			
 			//sending data using a datagram
 			System.out.println("Sending data to the server.");
-			DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
+			DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 5555);
 
 			clientSocket.send(sendPacket);
 			

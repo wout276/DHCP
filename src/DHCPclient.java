@@ -21,7 +21,7 @@ public class DHCPclient {
 				IPAddress = InetAddress.getByName(serverHostname);
 			} catch (UnknownHostException e) {}
 	}
-	static Integer serverPort = new Integer(1234);
+	static Integer serverPort = new Integer(5555);
     static final long TIMEOUT = new Integer(10000);
     static final int REQUESTED_IP = 50;
     static final int LEASETIME = 51;

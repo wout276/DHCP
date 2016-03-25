@@ -13,7 +13,7 @@ public class UDPserver {
 		try {
 			
 			//Creating UDP socket
-			DatagramSocket serverSocket = new DatagramSocket(9876);
+			DatagramSocket serverSocket = new DatagramSocket(5555);
 			
 			//starting never ending loop listening for packages
 			while (true) {

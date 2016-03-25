@@ -18,6 +18,13 @@ public class DHCPsocket extends DatagramSocket  {
     
     
     //constructor
+    public DHCPsocket (int port) throws SocketException, IOException {
+    	super(port);
+    	//containers for data to transmit   
+    	this.setSoTimeout(defaultSOTIME_OUT); // set default time out
+    }
+    
+  //constructor
     public DHCPsocket () throws SocketException, IOException {
     	//containers for data to transmit   
     	this.setSoTimeout(defaultSOTIME_OUT); // set default time out
@@ -51,7 +58,7 @@ public class DHCPsocket extends DatagramSocket  {
     public synchronized void send(DHCPpacket packet) throws IOException {
     	byte data[] = new byte[PACKET_SIZE];
     	data = packet.toByteArray();
-    	DatagramPacket result = new DatagramPacket(data, data.length, IPAddress, 1234);
+    	DatagramPacket result = new DatagramPacket(data, data.length, IPAddress, 5555);
     	this.send(result);
     }
     
