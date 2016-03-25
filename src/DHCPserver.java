@@ -24,9 +24,8 @@ public class DHCPserver {
 	private ThreadPoolExecutor threadPool;
 	
 	public static void main(String[] args) throws Exception {
-		
-		
-		
+		DHCPserver server = new DHCPserver();
+		server.run();
 	}
 	
 	private void run(){
@@ -40,7 +39,15 @@ public class DHCPserver {
 		} catch (SocketException e) {}
 				
 		//Starting a thread pool
-		this.threadPool = new ThreadPoolExecutor(3, 20, 3, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(5), new serverThread());
+		this.threadPool = new ThreadPoolExecutor(2, 5, 10000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(5), new serverThread());
+		this.threadPool.prestartAllCoreThreads();
+		
+		while(true){
+			DHCPpacket receiver = new DHCPpacket();
+			serverSocket.receive(receiver);
+			DHCPclienthandler handler = new DHCPclienthandler(this, receiver, serverSocket);
+			this.threadPool.execute(handler);
+		}
 	}
 	
 	private class serverThread implements ThreadFactory {
@@ -52,22 +59,21 @@ public class DHCPserver {
 		public Thread newThread(Runnable r) {
 			return new Thread(r);
 		}
-
 	}
 	
-	private void setConnection(int nr, String mac){
+	public void setConnection(int nr, String mac){
 		connections.put(nr, mac);
 	}
 
-	private String getConnectionChaddr(int nr){
+	public String getConnectionChaddr(int nr){
 		return connections.get(nr);
 	}
 	
-	private int getConnectionIp(String mac){
+	public int getConnectionIp(String mac){
 		return connections.inverse().get(mac);
 	}
 
-	private int assignIpNumber(String mac){
+	public int assignIpNumber(String mac){
 		int ip = ipOffset;
 		boolean available = false;
 		while (available == false){
