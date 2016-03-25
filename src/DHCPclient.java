@@ -30,9 +30,9 @@ public class DHCPclient {
 	static String MACadr = new String("18:19:D2:66:52:47");
 	static byte [] MACadr_bytes = bytesFromMAC(MACadr);
 	
-	
 	@SuppressWarnings("unused")
 	public static void main(String[] args) throws Exception {
+		System.out.println("Ulle moe is ulle va");
 		//Creating the socket
 		DHCPsocket clientSocket = new DHCPsocket();
 		System.out.println("Connecting to " + IPAddress);

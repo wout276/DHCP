@@ -1,5 +1,9 @@
 import java.io.IOException;
+<<<<<<< HEAD
 import java.util.Random;
+=======
+import DHCPpacket;
+>>>>>>> 022b92ddaf84e746d0f33a9fbf7dcd8eafe21844
 
 /**
  * @author r0449276
