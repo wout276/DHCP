@@ -61,19 +61,19 @@ public class DHCPserver {
 		}
 	}
 	
-	private void setConnection(int nr, String mac){
+	public void setConnection(int nr, String mac){
 		connections.put(nr, mac);
 	}
 
-	private String getConnectionChaddr(int nr){
+	public String getConnectionChaddr(int nr){
 		return connections.get(nr);
 	}
 	
-	private int getConnectionIp(String mac){
+	public int getConnectionIp(String mac){
 		return connections.inverse().get(mac);
 	}
 
-	private int assignIpNumber(String mac){
+	public int assignIpNumber(String mac){
 		int ip = ipOffset;
 		boolean available = false;
 		while (available == false){
