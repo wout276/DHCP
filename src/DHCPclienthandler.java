@@ -1,5 +1,9 @@
 import java.io.IOException;
+<<<<<<< HEAD
+import java.util.Random;
+=======
 import DHCPpacket;
+>>>>>>> 022b92ddaf84e746d0f33a9fbf7dcd8eafe21844
 
 /**
  * @author r0449276
@@ -17,8 +21,14 @@ public class DHCPclienthandler implements Runnable {
     static final int MESSAGE_TYPE = 53;
     static final int T1 = 58;
     static final int T2 = 59;
+	//server.setConnection("ip", "MAC");
+	//server.getConnectionChaddr("ip");
+	//server.getConnectionIp("MAC");
+	//server.assignIpNumber();
+	//server.isIpAvailable("ip");
+    //server.removeConnection("MAC")
 	
-	public DHCPclienthandler(DHCPserver inServer, DHCPpacket serverPacket, DHCPsocket inSocket) throws Exception {
+	public DHCPclienthandler(DHCPserver inServer, DHCPpacket serverPacket, DHCPsocket inSocket) {
 		server = inServer;
 		packet = serverPacket;
 		socket = inSocket;
@@ -53,24 +63,37 @@ public class DHCPclienthandler implements Runnable {
 	}
 	
 	private static DHCPpacket prepareOffer(DHCPpacket packet){
-		server.setConnection((int) 0, "MAC");
-		server.getConnectionChaddr((int) 0);
-		server.getConnectionIp("MAC");
-		server.assignIpNumber("MAC");
-		server.checkConnection("ip");
-		return packet;
+		String ip = server.assignIpNumber();
+		//DHCPrequest opcode to bootReply
+    	packet.setOp((byte) 2);
+    	//Set yiaddr to the offered IP
+    	packet.setYiaddr(bytesFromIp(ip));
+        //set messageType in options to 'offer'
+    	byte[] option = new byte[1];
+	    option[0] = (byte) DHCPpacket.packetCode("OFFER");
+	    packet.getOptionsList().updateOption(MESSAGE_TYPE, option);
+    	return packet;
 	}
 	
 	private static DHCPpacket prepareAck(DHCPpacket packet){
-		return packet;
+		String MAC = MACFromBytes(packet.getChaddr());
+		String ip = server.setConnection(stringFromByte(packet.getYiaddr()),MAC);
+		//DHCPrequest opcode to bootReply
+    	packet.setOp((byte) 2);
+        //set messageType in options to 'offer'
+    	byte[] option = new byte[1];
+	    option[0] = (byte) DHCPpacket.packetCode("ACK");
+	    packet.getOptionsList().updateOption(MESSAGE_TYPE, option);
+    	return packet;
 	}
 	
 	private static DHCPpacket prepareNak(DHCPpacket packet){
 		return packet;
 	}
 	
-	private static DHCPpacket prepareRelease(DHCPpacket packet){
-		return packet;
+	private static void handleRelease(DHCPpacket packet){
+		String MAC_bytes = MACFromBytes(packet.getChaddr());
+		server.removeConnection(MAC_bytes);
 	}
 	
 	private static DHCPpacket chooseAckNak(DHCPpacket packet){
@@ -82,4 +105,49 @@ public class DHCPclienthandler implements Runnable {
 	private static void send(DHCPpacket packet) throws IOException{
 		socket.send(packet);
 	}
+	
+	//TODO
+	// Convert a byte[] to a string
+	//voor ip adressen
+    private static String stringFromByte(byte[] bytes){
+    	//System.out.println(Arrays.toString(bytes));
+	    String str = new String();
+        for (int x = 0; x < bytes.length; x++) {
+            if (x < 3) {
+                str += ".";
+            } else {
+                str += (int)((char) bytes[x]%256);
+            }
+        }
+        return str;
+    }
+
+    //convert a byte[] to a long
+    private static long longFromByte(byte[] bytes){
+        long result = 0;
+        for (int x = 0; x < bytes.length; x++){
+           result = (result << 8) + (bytes[x] & 0xff);
+        }
+        return result;
+    }
+
+    //Function for converting the MAC-address to bytes
+    private static byte[] bytesFromMAC(String MACadr){
+        String[] MACadr_split = MACadr.split(":");
+        byte[] MACadr_bytes = new byte[16];
+        for (int x=0; x<6; x++){
+            MACadr_bytes[x] = (byte) (Integer.parseInt(MACadr_split[x], 16));
+        }
+        return MACadr_bytes;
+    }
+    
+    private static String MACFromBytes(byte[] MACadr_byte){
+        String MACadr = null;
+        return MACadr;
+    }
+    
+    private static byte[] bytesFromIp(String ip){
+        byte[] MACadr = new byte[4];
+        return MACadr;
+    }
 }
