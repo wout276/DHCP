@@ -2,3 +2,6 @@
 .project
 *.class
 bin/
+.gitignore~
+.gitignore~~
+.gitignore~~~
