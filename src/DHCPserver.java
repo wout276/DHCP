@@ -77,7 +77,7 @@ public class DHCPserver {
 		return connections.inverse().get(mac);
 	}
 
-	public String assignIpNumber(String mac){
+	public String assignIpNumber(){
 		int ip = ipOffset;
 		boolean available = false;
 		while (available == false){

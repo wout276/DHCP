@@ -1,7 +1,6 @@
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.Random;
 
 /**
  * @author r0449276
@@ -129,44 +128,48 @@ public class DHCPclienthandler implements Runnable {
 	// Convert a byte[] to a string
 	//voor ip adressen
     private static String stringFromByte(byte[] bytes){
-    	//System.out.println(Arrays.toString(bytes));
-	    String str = new String();
-        for (int x = 0; x < bytes.length; x++) {
-            if (x < 3) {
-                str += ".";
-            } else {
-                str += (int)((char) bytes[x]%256);
-            }
-        }
-        return str;
-    }
-
-    //convert a byte[] to a long
-    private static long longFromByte(byte[] bytes){
-        long result = 0;
-        for (int x = 0; x < bytes.length; x++){
-           result = (result << 8) + (bytes[x] & 0xff);
-        }
+    	// Makkelijke methode voor 127.0.0.100:
+    	// String str = Arrays.toString(bytes);
+	    // String result = str.substring(0, 3) + "." + str.charAt(3) + "." + str.charAt(4) + "." + str.substring(5);
+	    String result = new String();
+	    for(byte b : bytes){
+	    	String part = Byte.toString(b);
+	    	result.concat(part + ".");
+	    }
+	    result = result.substring(0, result.length() - 1);
         return result;
     }
 
-    //Function for converting the MAC-address to bytes
-    private static byte[] bytesFromMAC(String MACadr){
-        String[] MACadr_split = MACadr.split(":");
-        byte[] MACadr_bytes = new byte[16];
-        for (int x=0; x<6; x++){
-            MACadr_bytes[x] = (byte) (Integer.parseInt(MACadr_split[x], 16));
-        }
-        return MACadr_bytes;
-    }
     
     private static String MACFromBytes(byte[] MACadr_byte){
-        String MACadr = null;
-        return MACadr;
+    	// 18:19:D2:66:52:47
+        String str = bytesToHex(MACadr_byte);
+        String result = str.substring(0, 2) + ":" + str.substring(2, 4) + ":" + str.substring(4, 6) + ":" + str.substring(6, 8) + ":" + str.substring(8, 10) + ":" + str.substring(10);
+        return result;
+    }
+    
+    // This code (hexArray) was taken from http://stackoverflow.com/questions/9655181/how-to-convert-a-byte-array-to-a-hex-string-in-java
+    final private static char[] hexArray = "0123456789ABCDEF".toCharArray();
+    public static String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for ( int j = 0; j < bytes.length; j++ ) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
     }
     
     private static byte[] bytesFromIp(String ip){
         byte[] MACadr = new byte[4];
+        // 127.0.0.100
+        for ( int k = 0; k < 3; k++ ) {
+        	int pos = ip.indexOf(".");
+        	byte part = Byte.parseByte(ip.substring(0, pos));
+        	MACadr[k] = part;
+        	ip = ip.substring(pos + 1);
+        }
+        MACadr[4] = Byte.parseByte(ip);
         return MACadr;
     }
 }
